@@ -1,0 +1,579 @@
+---
+title: "HW3"
+author: "Elle Boodsakorn"
+date: "4/6/2022"
+output:
+  md_document:
+    variant: markdown_github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(tidyr)
+library(readr)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+library(rsample) 
+library(randomForest)
+library(lubridate)
+library(modelr)
+library(pdp)
+library(kableExtra)
+library(data.table)
+library(gbm)
+library(pdp)
+library(ggmap)
+library(rstudioapi)
+library(sjPlot)
+library(glmnet)
+library(mosaic)
+library("devtools")
+```
+
+#What causes what?
+###Why can’t I just get data from a few different cities and run the regression of “Crime” on “Police” to understand how more cops in the streets affect crime?
+The relationship between number of polices and crime rate suffers from endogeneity, x (number of polices) correlates with e (could be city's specific characteristics). Some cities that have high crime rate to begin with will typically hire polices. So the least square estimator can be biased. To control for heterogeneity across cities, we need cities fixed effect. 
+
+Another problem is simultaneity. It is hard distinguish whether the change in crime rate causes the change in number of polices or vice versa. For example, high crime rates likely to increase marginal productivity of police. Cities with an inordinate amount of crime, therefore, tend to employ a large police force. Even if polices reduce crime, the crime rate will still be high. Thus, simple linear regression by using data from different cities will generate biased estimator.
+
+###How were the researchers from UPenn able to isolate this effect? Briefly describe their approach and discuss their result in the “Table 2” below, from the researchers' paper
+They wanted to isolate the effect of number of polices on crime by finding a variable unrelated to crime, but causes change in number of polices, and they found the terrorism alert level was a great case. By law, since Washington, D.C., is likely to be a terrorism target, when the terror alert level goes to orange, then extra police are put on the Mall and other parts of Washington to protect against terrorists. It has nothing to do with street crime or things like that. From table 2 column 1, the coefficient on the alert level is statistically significant at the 5 percent level and indicates that on high-alert days, total crimes decrease by an average of seven crimes per day, or approximately 6.6 percent. 
+
+Also, they considered that it was possible that tourists were less likely to visit Washington or to go out on high-alert day, which mean there were going to be less victims on the street. From table 2 column 2, they verify that high-alert levels are not being confounded with tourist levels by including logged midday Metro ridership directly in the regression. 
+
+###Why did they have to control for Metro ridership? What was that trying to capture?
+So there are less victims. But is it because there are less tourists? and therefore less victims? They controlled for Metro ridership so that they can check the hypothesis of whether high-alert levels are confounded with tourist levels or not. By controlling for tourism, the researchers are trying to show that it is the increased police presence, rather than the decrease in people out-and-about that leads to the observed decrease in crime. Controlling for ridership worked because ridership is related to number of tourists but unrelated to crime rate. They are trying to capture causal effect of number of polices on crime rate.
+
+###Below I am showing you "Table 4" from the researchers' paper. Just focus on the first column of the table. Can you describe the model being estimated here? What is the conclusion?
+D.C. is split into seven police districts. Table 4 uses this fact to find more variation in policing response to the high-alert days. District 1 includes the National Mall. Given that District 1 includes important targets, the researchers hypothesize that increased police attention will be given to District 1 relative to other. Hence, one would expect to see a larger effect of high-alert days on crime in District 1 than other districts. Including district fixed effects in the model (as well as day of the week fixed effects and weather effects), the researchers find a statistically significant decrease in crime of 2.621 crimes per day (or 15%) for District 1 and a decrease in crime of .571 for other districts, but this not statistically significant. This extra dimension of geographic variation strengthens the researchers conclusion that increased police presence reduces crime. In short, daily crime drops on high-alert days in DC. Moreover, daily crime drops more in police districts that greatly increase their police presence on high alert days relative to those that don’t increase their police presence by that much. Additionally, it does not appear the effects are driven by tourism or some other factor relating to people being out-and-about, since the researchers control for Metro ridership and still find statistically significant effects of police on crime.
+
+##Tree modeling: dengue cases
+```{r setup 1.1, warning=FALSE, echo=FALSE}
+dengue <- read_csv("https://raw.githubusercontent.com/jgscott/ECO395M/master/data/dengue.csv") %>% drop_na()
+
+## Tree modeling: dengue cases
+lapply(dengue, class)
+
+dengue$city <- dengue$city %>% factor()
+dengue$season <- dengue$season %>% factor()
+dengue_split <- initial_split(dengue, 0.8)
+dengue_train <- training(dengue_split)
+dengue_test <- testing(dengue_split)
+
+# CART
+dengue_cart <- rpart(total_cases ~ season + specific_humidity + tdtr_k + precipitation_amt, data = dengue_train, control = rpart.control(cp = 0.002, minsplit = 30))
+
+plotcp(dengue_cart, main = "Cross_Validated Error by CP")
+
+# a handy function for picking the smallest tree whose CV error is within 1 std err of the minimum
+cp_1se = function(my_tree) {
+    out = as.data.frame(my_tree$cptable)
+    thresh = min(out$xerror + out$xstd)
+    cp_opt = max(out$CP[out$xerror <= thresh])
+    cp_opt
+}
+
+cp_1se(dengue_cart)
+
+# this function actually prunes the tree at that level
+prune_1se = function(my_tree) {
+    out = as.data.frame(my_tree$cptable)
+    thresh = min(out$xerror + out$xstd)
+    cp_opt = max(out$CP[out$xerror <= thresh])
+    prune(my_tree, cp=cp_opt)
+}
+
+dengue_cart_prune <- prune_1se(dengue_cart)
+
+# Random Forest
+dengue_forest <- randomForest(total_cases ~ season + specific_humidity + tdtr_k + precipitation_amt, data = dengue_train, importance = TRUE, na.action = na.omit)
+
+# shows out-of-bag MSE as a function of the number of trees used
+plot(dengue_forest, main = "Out-of-Bag MSE by Number of Trees") #not using test set
+
+# Gradient Boosting
+dengue_gradient_boosting <- gbm(total_cases ~ season + specific_humidity + tdtr_k + precipitation_amt, data = dengue_train, distribution = "gaussian",n.trees = 10000, shrinkage = 0.01, interaction.depth = 4)
+
+# Look at error curve 
+gbm.perf(dengue_gradient_boosting)
+
+modelr::rmse(dengue_cart, dengue_test)
+modelr::rmse(dengue_cart_prune, dengue_test)
+modelr::rmse(dengue_forest, dengue_test)
+modelr::rmse(dengue_gradient_boosting, dengue_test)
+
+rmsemodels <- c("RMSE CART" = rmse(dengue_cart, dengue_test),
+                "RMSE CART Prune" = rmse(dengue_cart_prune, dengue_test), 
+                "RMSE Random Forest" = rmse(dengue_forest, dengue_test),
+                "RMSE Gradient Boosting" = rmse(dengue_gradient_boosting, dengue_test))
+
+kable(rmsemodels, col.names = c("RMSE"), caption = "**Table 2.1 RMSE per Model**", format_caption = c("italic", "underline")) %>%
+    kable_styling(bootstrap_options = "striped", full_width = F)
+
+# Random Forest is best
+partialPlot(dengue_forest, as.data.frame(dengue_test), 'specific_humidity', las = 1)
+partialPlot(dengue_forest, as.data.frame(dengue_test), 'precipitation_amt', las = 1)
+partialPlot(dengue_forest, as.data.frame(dengue_test), 'season', las = 1) #get a bar graph
+```
+
+##Predictive model building: green certification
+To build the most accurate predictive model possible, we compared multiple statistical methods: a hand-built linear model, a linear model using forward selection, Lasso model, and two tree-based models using bagging and random forest, respectively. We first compared the two linear models with Lasso by using train/test splits with a loop of 100 to calculate the RMSE, and we concluded that Lasso did not result in an improved prediction accuracy. Therefore, we included the tree-based models to try and improve our predictions. In order to decide which model performs best, out of the 5 previously described models, we employed Leave-one-out cross validation (LOOCV) RMSE, and chose the one that decreased the RMSE the most. 
+
+Before starting fitting regression models, we needed to omit all missing variables in the dataset. Total observations got reduced from 7,894 to 7,820. In addition, we included green_ratings instead of  LEED and EnergyStar in all of the models, and used cd_total_07 and hd_total07 separately instead of total_dd_07. Since cluster rent is most likely a function of Rent, we omitted it to avoid regressing the target variable on a variable that is a part of the target variable itself.
+
+### First Model: Hand-Built Linear Model
+
+We built a multiple linear regression model with variables that, based on our knowledge and intuition, can affect rent. The model and the selected variables are shown below: 
+
+Rent<sub>&beta;</sub> = &beta;<sub>1</sub> cluster + &beta;<sub>2</sub> size + &beta;<sub>3</sub> empl_gr + &beta;<sub>4</sub> leasing_rate + &beta;<sub>5</sub> stories + &beta;<sub>6</sub> stories* size + &beta;<sub>7</sub> cd_total_07* Electricity_Costs + &beta;<sub>8</sub> age + &beta;<sub>9</sub> renovated + &beta;<sub>10</sub> class_a + &beta;<sub>11</sub> class_b + &beta;<sub>12</sub> green_rating + &beta;<sub>13</sub> net + &beta;<sub>14</sub> amenities + &beta;<sub>15</sub> cd_total_07 + &beta;<sub>16</sub> hd_total07 + &beta;<sub>17 </sub> Precipitation + &beta;<sub>18</sub> Gas_Costs + &beta;<sub>19</sub> Electricity_Costs + &beta;<sub>20</sub> Electricity_Costs*hd_total07
+
+```{r setup 1.2, warning=FALSE, echo=FALSE}
+greenbuildings <- read_csv("https://raw.githubusercontent.com/jgscott/ECO395M/master/data/greenbuildings.csv")
+
+clean_greenbuildings <- na.omit(greenbuildings)
+lm_RentPrice <- lm(Rent ~ cluster + size + empl_gr  + leasing_rate 
+                   + stories + stories*size + cd_total_07*Electricity_Costs
+                   + age + renovated + class_a + class_b + green_rating + net 
+                   + amenities + cd_total_07 + hd_total07 + Precipitation 
+                   + Gas_Costs + Electricity_Costs + Electricity_Costs*hd_total07 
+                   , data = clean_greenbuildings)
+
+lm0 <- lm(Rent ~ 1, data = clean_greenbuildings)
+lm_forward <- step(lm0, direction='forward',
+                   scope=~(cluster + size + empl_gr  + leasing_rate + stories
+                           + age + renovated + class_a + class_b + green_rating + net 
+                           + amenities + cd_total_07 + hd_total07 + Precipitation 
+                           + Gas_Costs + Electricity_Costs)^2)
+lm_Rent_Forward <- update(lm_forward, data = clean_greenbuildings)
+
+tab_model(lm_RentPrice, lm_Rent_Forward, show.ci = FALSE, dv.labels =  c("Hand-Built Linear Model", "Forward Selection Linear Model"))
+```
+
+### Second Model: Model Based on Forward Selection
+
+For the second model, we used forward selection in order to select variables that improve the prediction accuracy.
+
+The table below lists the variables and estimates for the hand-built multiple linear regression model and for the forward selected regression model, respectively.
+
+```{r setup 1.3, warning=FALSE, echo=FALSE}
+greenbuildings <- read_csv("https://raw.githubusercontent.com/jgscott/ECO395M/master/data/greenbuildings.csv")
+
+clean_greenbuildings <- na.omit(greenbuildings)
+
+tab_model(lm_RentPrice, lm_Rent_Forward, show.ci = FALSE, 
+          dv.labels =  c("Hand-Built Linear Model", "Forward Selection Linear Model"),
+          title = "**Table 1.0: Coefficients of the Hand-Built and Forward Selection Linear Models**",
+          CSS = list(
+              css.depvarhead = 'color: red;',css.summary = 'color: blue;'))
+```
+
+### Third Model: Lasso Model
+
+By using a shrinkage method like Lasso, we depart from optimality and concentrate on stabilizing the system. Since the two linear models above include many variables, there is the possibility of high variance because each nonzero independent variable included in the model incurs a cost of employing data to estimate it, hence, increasing the variance. Through Lasso model, we make the cost we incur from having many variables explicit. Therefore, through coefficient shrinkage, we can reduce their variance. 
+
+The variable regression and the accuracy of the Lasso model fit largely depend on the choice of lambda. The coefficient plot below shows that depending on the value of the tuning parameter, some of the coefficients will be set equal to 0. 
+
+```{r setup 1.4, warning=FALSE, echo=FALSE}
+x <- model.matrix(Rent ~ cluster + size + empl_gr + leasing_rate + stories
+                  + age + renovated + class_a + class_b + green_rating + net
+                  + amenities + cd_total_07 + hd_total07 + Precipitation 
+                  + Gas_Costs + Electricity_Costs, data = clean_greenbuildings)[,-1]
+
+x <- scale(x, center = TRUE, scale = TRUE) 
+y <- clean_greenbuildings$Rent
+grid <- 10^seq(10,-2, length =100)
+lasso.mod <- glmnet(x, y, alpha = 1, lambda = grid)
+cv.out <- cv.glmnet(x, y, alpha = 1)
+
+bestlam <- cv.out$lambda.min
+
+plot(lasso.mod)
+title("Figure 3.1: Lasso Coefficients as a Function of L1 Norm", line = 3)
+```
+
+By employing Lasso model, we consider the variance-bias trade off, and examine lambda. If lambda is high, the variance decreases but bias increases.
+
+We used cross-validation as a method to select the tuning parameter, lambda. We chose a grid of lambda values that vary from 10^(-2) to 10^10 and computed the leave-one-out cross validation error for each of these values. The tuning parameter of 0.008 has the smallest cross validation error, so we chose it for the refit of the Lasso model. The graph below illustrates the lambda with the least CV Mean Squared Error(MSE). However, the dip of the CV MSE, where the lambda gives a small error, is not very pronounced, resulting in a wide range of values for lambda that will give similar errors. 
+
+```{r setup 1.5, warning=FALSE, echo=FALSE}
+plot(cv.out)
+title("Figure 3.2: Mean-Squared Error as a Function of log Lambda", line = 3)
+```
+
+Since lambda is very close to 0, approximately 0.008, Lasso’s results will be very close to the least squares models with high variance and low bias. The table below shows the Lasso coefficient estimates. Using lambda = 0.008, all the 17 coefficient estimates are nonzero. 
+
+```{r setup 1.6, warning=FALSE, echo=FALSE}
+lasso.coef <- predict(lasso.mod ,type = "coefficients", s = bestlam)
+LassoCoef <- as.data.table(as.matrix(lasso.coef), keep.rownames = TRUE)
+kable(LassoCoef, col.names = c("Predictor", "Estimate"), caption = "**Table 3.1 Lasso Model Predictor Estimates**", format_caption = c("italic", "underline")) %>%
+    kable_styling(bootstrap_options = "striped", full_width = F)
+```
+
+Next, we use train/test splits with a loop of 100 to calculate the average RMSE of each of the three models shown above. Table 1.2 illustrates the average RMSE for each of the models. 
+
+```{r setup 1.7, warning=FALSE, echo=FALSE}
+rmse <- function(y, yhat) {sqrt(mean((y - yhat)^2))}
+library(mosaic)
+LoopModels <- do(100)*{
+    n = nrow(clean_greenbuildings)
+    n_train = round(0.8 * n)  # round to nearest integer
+    n_test = n - n_train
+    train_cases = sample.int(n, n_train, replace=FALSE)
+    test_cases = setdiff(1:n, train_cases) 
+    greenbuildings_train = clean_greenbuildings[train_cases,]
+    greenbuildings_test = clean_greenbuildings[test_cases,]
+    
+    lm_RentPrice = lm(Rent ~ cluster + size + empl_gr  + leasing_rate 
+                      + stories + stories*size + cd_total_07*Electricity_Costs
+                      + age + renovated + class_a + class_b + green_rating + net 
+                      + amenities + cd_total_07 + hd_total07 + Precipitation 
+                      + Gas_Costs + Electricity_Costs + Electricity_Costs*hd_total07 
+                      , data=greenbuildings_train)
+    
+    lm_Rent_Forward = update(lm_forward, data = greenbuildings_train)
+    
+    x = model.matrix(Rent ~ cluster + size + empl_gr  + leasing_rate + stories
+                     + age + renovated + class_a + class_b + green_rating + net 
+                     + amenities + cd_total_07 + hd_total07 + Precipitation 
+                     + Gas_Costs + Electricity_Costs, data = clean_greenbuildings)[,-1]
+    x = scale(x, center = TRUE, scale = TRUE) 
+    y = clean_greenbuildings$Rent
+    grid = 10^seq(10,-2, length =100)
+    lasso.mod = glmnet(x[train_cases,],y[train_cases], alpha = 1, lambda = grid)
+    cv.out = cv.glmnet(x[train_cases,],y[train_cases],alpha=1)
+    bestlam = cv.out$lambda.min
+    
+    yhat_test_lmRentPrice = predict(lm_RentPrice, greenbuildings_test)
+    yhat_test_RentForward = predict(lm_Rent_Forward, greenbuildings_test)
+    yhat_lm_Rent_Lasso = predict(lasso.mod, s = bestlam, newx = x[test_cases,])
+    
+    c(RMSERentPrice = rmse(greenbuildings_test$Rent, yhat_test_lmRentPrice),
+      RMSERentForward = rmse(greenbuildings_test$Rent, yhat_test_RentForward),
+      RMSERentLasso = rmse(greenbuildings_test$Rent,yhat_lm_Rent_Lasso))
+    
+}
+
+RMSEMeans <- c("Hand-Built Linear Model" = mean(LoopModels$RMSERentPrice), 
+               "Forward Selection Linear Model" = mean(LoopModels$RMSERentForward), 
+               "Lasso" = mean(LoopModels$RMSERentLasso))
+
+kable(RMSEMeans, col.names = c("Average RMSE"), caption = "**Table 1.2 Average RMSE per Model**",  format_caption = c("italic", "underline")) %>%
+    kable_styling(bootstrap_options = "striped", full_width = F)
+```
+
+### Tree-Based Models
+Since Lasso model results in higher RMSE than the linear regression models, we decided to perform two tree decision models using bagging and random forest. 
+
+**Bagging**
+```{r setup 1.8, warning=FALSE, echo=FALSE}
+set.seed(1)
+greenbuildBagging <- randomForest(Rent ~ cluster + size + empl_gr + leasing_rate + stories + age + renovated + class_a + class_b + green_rating + net + amenities + cd_total_07 + hd_total07 + Precipitation + Gas_Costs + Electricity_Costs, data = greenbuildings_train, mtry=17, importance=TRUE)
+#bagging is just random forest with m = p. So here it is 17 = 17
+
+greenbuildBagging
+```
+
+The plot below shows that the bagging procedure can produce quite accurate predictions most of the time.
+
+```{r setup 1.9, warning=FALSE, echo=FALSE}
+
+yhat_greenbuildBagging <- predict(greenbuildBagging, newdata = greenbuildings_test)
+
+plot(yhat_greenbuildBagging, greenbuildings_test$Rent, xlab = "Predicted Values for Rent: Bagging", ylab = "Rent")
+title("Figure 3.3: Comparison between Bagging Predicted Values of Rent\n and Actual Rent Prices")
+```
+
+**Random Forest** 
+
+    We also ran a random forest model since it is an improvement procedure over bagging. Random forest also builds decision trees by bootstrapping the training samples. We again used 500 number of trees to be bootstrapped. However, instead of considering all variables in each split, random forest chooses only a set of these variables for the tree split. We decided to use a square root of the number of the original variables, which is sqrt(17), approximately 4 variables. Therefore, at each split, a new sample of these 4 predictors is taken. 
+
+    By using a different sample of 4 predictors in each split instead of all 17 variables, we avoid the highly correlated predictions that result from bagging. Random forest produced less correlated predictions. In the bagging procedure, since all variables are used, majority of trees will use the strong predictor at the top of tree, which will result in increased correlation of the predictions. Hence, bagging will usually not lead to a smaller reduction in variance than random forest because it averages highly correlated predictions. Therefore, by averaging uncorrelated quantities, random forest will generally result in a higher decrease in variance in the average of the resulting trees. 
+
+  The plot below illustrates the accuracy of the random forest prediction model. 
+
+```{r setup 1.10, warning=FALSE, echo=FALSE}
+set.seed(1)
+
+greenbuildRandomForest <- randomForest(Rent ~ cluster + size + empl_gr  + leasing_rate + stories
+                                      + age + renovated + class_a + class_b + green_rating + net 
+                                      + amenities + cd_total_07 + hd_total07 + Precipitation 
+                                      + Gas_Costs + Electricity_Costs, data = greenbuildings_train,
+                                      mtry=4, importance=TRUE)
+
+yhat_greenbuildRandomForest <- predict(greenbuildRandomForest, newdata = greenbuildings_test)
+
+plot(yhat_greenbuildRandomForest, greenbuildings_test$Rent, xlab = "Predicted Values for Rent: Random Forest", ylab = "Rent")
+title("Figure 3.4: Comparison between Random Forest Predicted Values of Rent\n and Actual Rent Prices")
+```
+### Comparison of all 5 Predictive Models: Hand-Built Linear Model, Forward Selection, Lasso, Bagging and Random Forest
+
+    To compare all five models run so far, we are using a cross validation performance measure: the Leave-one-out cross validation (LOOCV). Table 3.3 below lists each RMSE found from performing the CV. 
+
+```{r setup 1.11, warning=FALSE, echo=FALSE}
+N <- nrow(clean_greenbuildings)
+K <- 5
+fold_id <- rep_len(1:K, N)
+fold_id <- sample(fold_id, replace = FALSE)
+
+#Compute cross validation error for Model1 
+err_save <- rep(0, K)
+for (i in 1:K) {
+    train_set <- which(fold_id != i)
+    y_testCV <- clean_greenbuildings$Rent[-train_set]
+    lm_RentPriceCV <- lm(Rent ~ cluster + size + empl_gr  + leasing_rate 
+                        + stories + stories*size + cd_total_07*Electricity_Costs
+                        + age + renovated + class_a + class_b + green_rating + net 
+                        + amenities + cd_total_07 + hd_total07 + Precipitation 
+                        + Gas_Costs + Electricity_Costs + Electricity_Costs*hd_total07 
+                        , data = clean_greenbuildings[train_set,]) 
+    
+    yhat_RentPrice_CV <- predict(lm_RentPriceCV, newdata = clean_greenbuildings[-train_set,])
+    
+    err_save[i] <- mean((y_testCV - yhat_RentPrice_CV)^2)
+}
+RMSE <- sqrt(mean(err_save))
+
+#Compute Cross Validation Method for Forward Selection Model  
+err_saveForward <- rep(0, K)
+for (i in 1:K) {
+    train_set <- which(fold_id != i)
+    y_testCV = clean_greenbuildings$Rent[-train_set]
+    
+    lm_Rent_ForwardCV <- update(lm_forward, data = clean_greenbuildings[train_set,])
+    
+    yhat_lm_RentForward_CV <- predict(lm_Rent_ForwardCV, newdata = clean_greenbuildings[-train_set,])
+    
+    err_saveForward[i] <- mean((y_testCV - yhat_lm_RentForward_CV)^2) 
+}
+RMSE2 <- sqrt(mean(err_saveForward)) 
+
+#compute cross validation error for Lasso Model 
+err_saveLasso <- rep(0, K)
+for (i in 1:K) {
+    train_set <- which(fold_id != i)
+    y_testCV <- clean_greenbuildings$Rent[-train_set] 
+    x <- model.matrix(Rent ~ cluster + size + empl_gr  + leasing_rate + stories
+                     + age + renovated + class_a + class_b + green_rating + net 
+                     + amenities + cd_total_07 + hd_total07 + Precipitation 
+                     + Gas_Costs + Electricity_Costs, data=clean_greenbuildings)[,-1]
+    x <- scale(x, center=TRUE, scale=TRUE) 
+    y <- clean_greenbuildings$Rent
+    grid <- 10^seq(10,-2, length =100)
+    lasso.mod <- glmnet(x[train_set,],y[train_set],alpha=1, lambda =grid)
+    cv.out <- cv.glmnet(x[train_set,],y[train_set],alpha=1)
+    bestlam <- cv.out$lambda.min
+    
+    yhat_lm_Rent_Lasso <- predict(lasso.mod, s=bestlam, newx=x[-train_set,])
+    
+    err_saveLasso[i] <- mean((y_testCV - yhat_lm_Rent_Lasso)^2)
+}
+RMSE3 <- sqrt(mean(err_saveLasso))
+
+err_saveTreeBag <- rep(0, K)
+for (i in 1:K) {
+    train_set <- which(fold_id != i)
+    greenbuildings_train <- clean_greenbuildings[train_set,]
+    #train_set = scale(train_set, center=TRUE, scale=TRUE) 
+    y_testCV <- clean_greenbuildings$Rent[-train_set] 
+    y <- clean_greenbuildings$Rent
+    greenbuildings_test <- clean_greenbuildings[-train_set,]
+    
+    set.seed(1)
+    greenbuildBagging <- randomForest(Rent ~ cluster + size + empl_gr  + leasing_rate + stories
+                                     + age + renovated + class_a + class_b + green_rating + net 
+                                     + amenities + cd_total_07 + hd_total07 + Precipitation 
+                                     + Gas_Costs + Electricity_Costs, data = greenbuildings_train,
+                                     mtry=17, importance=TRUE)
+    
+    yhat_greenbuildBagging <- predict(greenbuildBagging, newdata = greenbuildings_test)
+    
+    err_saveTreeBag[i] <- mean((y_testCV - yhat_greenbuildBagging)^2)
+}
+RMSE4 <- sqrt(mean(err_saveTreeBag))
+
+
+err_saveTreeForest <- rep(0, K)
+for (i in 1:K) {
+    train_set <- which(fold_id != i)
+    greenbuildings_train <- clean_greenbuildings[train_set,]
+    #train_set = scale(train_set, center=TRUE, scale=TRUE) 
+    y_testCV <- clean_greenbuildings$Rent[-train_set] 
+    y <- clean_greenbuildings$Rent
+    greenbuildings_test <- clean_greenbuildings[-train_set,]
+    
+    set.seed(1)
+    greenbuildRandomForest <- randomForest(Rent ~ cluster + size + empl_gr  + leasing_rate + stories
+                                          + age + renovated + class_a + class_b + green_rating + net 
+                                          + amenities + cd_total_07 + hd_total07 + Precipitation 
+                                          + Gas_Costs + Electricity_Costs, data = greenbuildings_train,
+                                          mtry=4, importance=TRUE)
+    
+    yhat_greenbuildRandomForest <- predict(greenbuildRandomForest, newdata = greenbuildings_test)
+    
+    err_saveTreeForest[i] = mean((y_testCV - yhat_greenbuildRandomForest)^2)
+}
+RMSE5 <- sqrt(mean(err_saveTreeForest))
+
+AvgRMSEModels = c("LOOCV RMSE Rent Hand-Built Model"=sqrt(mean(err_save)),
+                  "LOOCV RMSE Rent Forward Selection Model" = sqrt(mean(err_saveForward)), 
+                  "LOOCV RMSE Model Lasso Model" = sqrt(mean(err_saveLasso)),
+                  "LOOCV RMSE Model Bagging Model" = sqrt(mean(err_saveTreeBag)),
+                  "LOOCV RMSE Model RandomForest Model" = sqrt(mean(err_saveTreeForest)))
+
+kable(AvgRMSEModels, col.names = c("LOOCV RMSE"), caption = "**Table 1.3 LOOCV RMSE per Model**",  format_caption = c("italic", "underline")) %>%
+    kable_styling(bootstrap_options = "striped", full_width = F)
+```
+**Random Forest as the best predictive model possible** 
+    
+    The tree decision models perform almost twice better than the remaining three models, based on the RMSE. We decided to use Random Forest as a predictive model for rent since its does not differ as much from the RMSE of bagging, and the procedure it uses usually results in an improvement over bagging as mentioned before. 
+
+    Below is a list of the variable importance for each variable used in Random Forest. The first column shows the increase in Mean Squared Error if that particular variable is omitted from the model. The MSE is calculated based on the out of bag samples. The second column shows the increase in node purity that results from splits over that variable. The increase in node purity is averaged over all trees. As shown below, the most important variable based on MSE is "age" because if omitted, the MSE increases the most. However, Electricity costs and Size increase the most node purity. 
+
+```{r setup 1.12, warning=FALSE, echo=FALSE}    
+set.seed(1)
+greenbuildRandomForest2 <- randomForest(Rent ~ cluster + size + empl_gr  + leasing_rate + stories
+                                       + age + renovated + class_a + class_b + green_rating + net 
+                                       + amenities + cd_total_07 + hd_total07 + Precipitation 
+                                       + Gas_Costs + Electricity_Costs, data = clean_greenbuildings,
+                                       mtry=4, importance=TRUE)
+
+VariableImp <- as.data.table(importance(greenbuildRandomForest2), keep.rownames = TRUE)
+
+kable(VariableImp, caption = "**Table 3.4 Variable Importance in Random Forest Model**", col.names = c("Predictor", "% Increase in MSE", "Increase in Node Purity"),  format_caption = c("italic", "underline")) %>%
+    kable_styling(bootstrap_options = "striped", full_width = F)
+```
+
+### The Effect of Green Rating on Rent
+
+Figure 3.5 illustrates the partial dependence plot of the marginal effect that the green rating has on the outcome of Random Forest. 
+
+```{r setup 1.13, warning=FALSE, echo=FALSE}   
+clean_greenbuildings$green_rating <- 
+    unlist(clean_greenbuildings$green_rating)
+
+partialPlot(greenbuildRandomForest, as.data.frame(clean_greenbuildings[-train_set,]), 'green_rating', las = 1, main = "Figure 1.5: Partial Dependence on Green Rating")
+```
+
+It is difficlut to esitmate the partial effect of green_rating on rent in a random forest model since tree based models are nonlinear in coefficients. So, by random forest, we can only find approximation to the average effect of green_rating. 
+
+To find the average change in rental income per square foot considering green ratings and holding all other variables fixed, we calculated the difference between predicted values given a green rating and a non-green rating keeping all other variables the same. (Since green ratings is a dummy variable, to find the effect of the variable, we subtracted all predicted values given green_rating=0 from predicted values given green_rating=1, holding all other variables constant.) Afterwards, we took the average of the differences of predicted values to find the average effect of green ratings on rent price. Therefore, the average effect of green ratings on the rent price is approximately "0.3". This means that if the building is green then the rent will be on average 0.3 dollars per square foot per calendar year more expensive than if the building is non-green, holding all else fixed.
+
+```{r setup 1.14, warning=FALSE, echo=FALSE}   
+set.seed(1)
+greenbuildRandomForest3 <- randomForest(Rent ~ cluster + size + empl_gr  + leasing_rate + stories
+                                       + age + renovated + class_a + class_b + green_rating + net 
+                                       + amenities + cd_total_07 + hd_total07 + Precipitation 
+                                       + Gas_Costs + Electricity_Costs, data = clean_greenbuildings,
+                                       mtry=4, importance=TRUE)
+
+GreenRating0 <- replace(clean_greenbuildings, "green_rating", 0)
+GreenRating1 <- replace(clean_greenbuildings, "green_rating", 1)
+
+PredictGrRating0 <- predict(greenbuildRandomForest3, GreenRating0)
+PredictGrRating1 <- predict(greenbuildRandomForest3, GreenRating1)
+DifferencePredict0m1 <- data.table::data.table("DifferencePredict0m1" = PredictGrRating1 - PredictGrRating0)
+
+DiffMean = mean(DifferencePredict0m1$DifferencePredict0m1)
+
+kable(DiffMean, col.names = c("Average Green Rating Effect on Rent"), caption = "**Table 1.4 Average Effect on the Green Rating Variable on Rent**", format_caption = c("italic", "underline")) %>%
+    kable_styling(bootstrap_options = "striped", full_width = F)
+```
+
+### Conclusions: 
+
+1)	The best predictive models possible for price are the tree-based models, Random Forest and Bagging; 
+2)	The average change in rental income per square foot associated with green certification, holding other features of the building constant, is 0.3 dollars per square foot. 
+
+## Predictive model building: California housing
+```{r setup 1.15, warning=FALSE, echo=FALSE}  
+register_google(key = "AIzaSyDjCXavvnwba1KARYeX0z-FhiVlf6bnzcg")
+CAhousing <- read_csv("/Users/jirapat/Desktop/R/Data Mining/CAhousing.csv")
+CAmap <- get_map("california", zoom=4)
+CAhousing_split <- initial_split(CAhousing, 0.8)
+CAhousing_train <- training(CAhousing_split)
+CAhousing_test <- testing(CAhousing_split)
+
+#linear regression
+CAhousing_linear_regression <- lm(medianHouseValue ~ . - longitude - latitude, data = CAhousing_train)
+
+#stepwise selection
+CAhousing_stepwise <- step(CAhousing_linear_regression, scope=~(. - longitude - latitude)^2)
+
+#what variables are included?
+getCall(CAhousing_stepwise)
+coef(CAhousing_stepwise)
+
+#let's fit a single tree
+CAhousing_single_tree <- rpart(medianHouseValue ~ housingMedianAge + totalRooms + totalBedrooms + population + households + medianIncome, data = CAhousing_train, control = rpart.control(cp = 0.002, minsplit=30))
+
+#cross-validated error plot
+plotcp(CAhousing_single_tree, main = "Cross-Validated Error Plot for Single Tree") 
+
+#a handy function for picking the smallest tree whose CV error is within 1 std err of the minimum
+cp_1se = function(my_tree) {
+    out = as.data.frame(my_tree$cptable)
+    thresh = min(out$xerror + out$xstd)
+    cp_opt = max(out$CP[out$xerror <= thresh])
+    cp_opt
+} 
+
+cp_1se(CAhousing_single_tree)
+
+# this function actually prunes the tree at that level
+prune_1se = function(my_tree) {
+    out = as.data.frame(my_tree$cptable)
+    thresh = min(out$xerror + out$xstd)
+    cp_opt = max(out$CP[out$xerror <= thresh])
+    prune(my_tree, cp=cp_opt)
+}
+
+# let's prune our tree at the 1se complexity level
+CAhousing_single_tree_prune <- prune_1se(CAhousing_single_tree) #15 terminal nodes
+
+#random forest
+CAhousing_random_forest <- randomForest(medianHouseValue ~ housingMedianAge + totalRooms + totalBedrooms + population + households + medianIncome, data = CAhousing_train, importance = TRUE, na.action=na.omit)
+
+# shows out-of-bag MSE as a function of the number of trees used
+plot(CAhousing_random_forest, main = "Out-of-Bag MSE for Random Forest Model") #not using test set
+
+#boosted regression trees
+CAhousing_gradiant_boosted <- gbm(medianHouseValue ~ housingMedianAge + totalRooms + totalBedrooms + population + households + medianIncome, data = CAhousing_train, distribution = "gaussian", n.trees = 10000, shrinkage = 0.01, interaction.depth = 4)
+
+# Look at error curve
+gbm.perf(CAhousing_gradiant_boosted)
+
+
+problem1_rmse <- c("Linear Regression" = modelr::rmse(CAhousing_linear_regression, CAhousing_test),
+                "Stepwise" = modelr::rmse(CAhousing_stepwise, CAhousing_test),
+                "Single Tree" = modelr::rmse(CAhousing_single_tree, CAhousing_test),
+                "Single Tree Pruned" = modelr::rmse(CAhousing_single_tree_prune, CAhousing_test),
+                "Random Forest" = modelr::rmse(CAhousing_random_forest, CAhousing_test),
+                "Gradient Boosting" = modelr::rmse(CAhousing_gradiant_boosted, CAhousing_test))
+
+kable(problem1_rmse, col.names = c("RMSE"), caption = "**Table 4.1 RMSE per Model**", format_caption = c("italic", "underline")) %>%
+    kable_styling(bootstrap_options = "striped", full_width = F)
+```
+
+```{r setup 1.16, warning=FALSE, echo=FALSE} 
+#a plot of the original data
+CAmap <- get_map("california", zoom = 6)
+CA_ggmap <- ggmap(CAmap) + geom_point(aes(x = longitude, y = latitude, color = medianHouseValue), data = CAhousing, alpha = .3) + labs(x = 'longitude', y = 'latitude', title = "Median House Value Original Data", subtitle = '')
+CA_ggmap
+```
+
+```{r setup 1.17, warning=FALSE, echo=FALSE} 
+#a plot of your model's predictions of medianHouseValue
+#gradient boosting has lowest rmse
+CA_with_prediction <- CAhousing %>% mutate(p_MedianHouseValue = predict.gbm(CAhousing_gradiant_boosted, newdata = CAhousing)) #10000 trees
+
+ggmap(CAmap) + geom_point(aes(x = longitude, y = latitude, color = p_MedianHouseValue), data = CA_with_prediction, alpha = .3) + labs(x = 'longitude', y = 'latitude', title = "Predicted Median House Value", subtitle = '')
+```
+
+```{r setup 1.18, warning=FALSE, echo=FALSE} 
+#a plot of your model's errors/residuals
+CA_with_prediction <- CA_with_prediction %>% mutate(resid = medianHouseValue - p_MedianHouseValue)
+
+ggmap(CAmap) + geom_point(aes(x = longitude, y = latitude, color = resid), data = CA_with_prediction, alpha = .3) + labs(x = 'longitude', y = 'latitude', title = "Plot of Errors", subtitle = '')
+```
