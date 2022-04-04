@@ -1,11 +1,15 @@
-\#What causes what? \#\#\#Why can’t I just get data from a few different
-cities and run the regression of “Crime” on “Police” to understand how
-more cops in the streets affect crime? The relationship between number
-of polices and crime rate suffers from endogeneity, x (number of
-polices) correlates with e (could be city’s specific characteristics).
-Some cities that have high crime rate to begin with will typically hire
-polices. So the least square estimator can be biased. To control for
-heterogeneity across cities, we need cities fixed effect.
+\#What causes what?
+
+\#\#\#Why can’t I just get data from a few different cities and run the
+regression of “Crime” on “Police” to understand how more cops in the
+streets affect crime?
+
+The relationship between number of polices and crime rate suffers from
+endogeneity, x (number of polices) correlates with e (could be city’s
+specific characteristics). Some cities that have high crime rate to
+begin with will typically hire polices. So the least square estimator
+can be biased. To control for heterogeneity across cities, we need
+cities fixed effect.
 
 Another problem is simultaneity. It is hard distinguish whether the
 change in crime rate causes the change in number of polices or vice
@@ -17,17 +21,19 @@ by using data from different cities will generate biased estimator.
 
 \#\#\#How were the researchers from UPenn able to isolate this effect?
 Briefly describe their approach and discuss their result in the “Table
-2” below, from the researchers’ paper They wanted to isolate the effect
-of number of polices on crime by finding a variable unrelated to crime,
-but causes change in number of polices, and they found the terrorism
-alert level was a great case. By law, since Washington, D.C., is likely
-to be a terrorism target, when the terror alert level goes to orange,
-then extra police are put on the Mall and other parts of Washington to
-protect against terrorists. It has nothing to do with street crime or
-things like that. From table 2 column 1, the coefficient on the alert
-level is statistically significant at the 5 percent level and indicates
-that on high-alert days, total crimes decrease by an average of seven
-crimes per day, or approximately 6.6 percent.
+2” below, from the researchers’ paper
+
+They wanted to isolate the effect of number of polices on crime by
+finding a variable unrelated to crime, but causes change in number of
+polices, and they found the terrorism alert level was a great case. By
+law, since Washington, D.C., is likely to be a terrorism target, when
+the terror alert level goes to orange, then extra police are put on the
+Mall and other parts of Washington to protect against terrorists. It has
+nothing to do with street crime or things like that. From table 2 column
+1, the coefficient on the alert level is statistically significant at
+the 5 percent level and indicates that on high-alert days, total crimes
+decrease by an average of seven crimes per day, or approximately 6.6
+percent.
 
 Also, they considered that it was possible that tourists were less
 likely to visit Washington or to go out on high-alert day, which mean
@@ -37,40 +43,43 @@ tourist levels by including logged midday Metro ridership directly in
 the regression.
 
 \#\#\#Why did they have to control for Metro ridership? What was that
-trying to capture? So there are less victims. But is it because there
-are less tourists? and therefore less victims? They controlled for Metro
-ridership so that they can check the hypothesis of whether high-alert
-levels are confounded with tourist levels or not. By controlling for
-tourism, the researchers are trying to show that it is the increased
-police presence, rather than the decrease in people out-and-about that
-leads to the observed decrease in crime. Controlling for ridership
-worked because ridership is related to number of tourists but unrelated
-to crime rate. They are trying to capture causal effect of number of
-polices on crime rate.
+trying to capture?
+
+So there are less victims. But is it because there are less tourists?
+and therefore less victims? They controlled for Metro ridership so that
+they can check the hypothesis of whether high-alert levels are
+confounded with tourist levels or not. By controlling for tourism, the
+researchers are trying to show that it is the increased police presence,
+rather than the decrease in people out-and-about that leads to the
+observed decrease in crime. Controlling for ridership worked because
+ridership is related to number of tourists but unrelated to crime rate.
+They are trying to capture causal effect of number of polices on crime
+rate.
 
 \#\#\#Below I am showing you “Table 4” from the researchers’ paper. Just
 focus on the first column of the table. Can you describe the model being
-estimated here? What is the conclusion? D.C. is split into seven police
-districts. Table 4 uses this fact to find more variation in policing
-response to the high-alert days. District 1 includes the National Mall.
-Given that District 1 includes important targets, the researchers
-hypothesize that increased police attention will be given to District 1
-relative to other. Hence, one would expect to see a larger effect of
-high-alert days on crime in District 1 than other districts. Including
-district fixed effects in the model (as well as day of the week fixed
-effects and weather effects), the researchers find a statistically
-significant decrease in crime of 2.621 crimes per day (or 15%) for
-District 1 and a decrease in crime of .571 for other districts, but this
-not statistically significant. This extra dimension of geographic
-variation strengthens the researchers conclusion that increased police
-presence reduces crime. In short, daily crime drops on high-alert days
-in DC. Moreover, daily crime drops more in police districts that greatly
-increase their police presence on high alert days relative to those that
-don’t increase their police presence by that much. Additionally, it does
-not appear the effects are driven by tourism or some other factor
-relating to people being out-and-about, since the researchers control
-for Metro ridership and still find statistically significant effects of
-police on crime.
+estimated here? What is the conclusion?
+
+D.C. is split into seven police districts. Table 4 uses this fact to
+find more variation in policing response to the high-alert days.
+District 1 includes the National Mall. Given that District 1 includes
+important targets, the researchers hypothesize that increased police
+attention will be given to District 1 relative to other. Hence, one
+would expect to see a larger effect of high-alert days on crime in
+District 1 than other districts. Including district fixed effects in the
+model (as well as day of the week fixed effects and weather effects),
+the researchers find a statistically significant decrease in crime of
+2.621 crimes per day (or 15%) for District 1 and a decrease in crime of
+.571 for other districts, but this not statistically significant. This
+extra dimension of geographic variation strengthens the researchers
+conclusion that increased police presence reduces crime. In short, daily
+crime drops on high-alert days in DC. Moreover, daily crime drops more
+in police districts that greatly increase their police presence on high
+alert days relative to those that don’t increase their police presence
+by that much. Additionally, it does not appear the effects are driven by
+tourism or some other factor relating to people being out-and-about,
+since the researchers control for Metro ridership and still find
+statistically significant effects of police on crime.
 
 \#\#Tree modeling: dengue cases
 
@@ -127,11 +136,11 @@ police on crime.
 
 ![](HW3_files/figure-markdown_github/setup%201.1-1.png)
 
-    ## [1] 0.08249567
+    ## [1] 0.06122348
 
 ![](HW3_files/figure-markdown_github/setup%201.1-2.png)![](HW3_files/figure-markdown_github/setup%201.1-3.png)
 
-    ## [1] 211
+    ## [1] 215
     ## attr(,"smoother")
     ## Call:
     ## loess(formula = object$oobag.improve ~ x, enp.target = min(max(4, 
@@ -139,15 +148,15 @@ police on crime.
     ## 
     ## Number of Observations: 10000 
     ## Equivalent Number of Parameters: 39.99 
-    ## Residual Standard Error: 0.1344
+    ## Residual Standard Error: 0.1384
 
-    ## [1] 27.44342
+    ## [1] 26.1369
 
-    ## [1] 25.71317
+    ## [1] 27.20387
 
-    ## [1] 23.27455
+    ## [1] 25.23439
 
-    ## [1] 26.61649
+    ## [1] 26.49253
 
 <table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
@@ -168,7 +177,7 @@ RMSE
 RMSE CART
 </td>
 <td style="text-align:right;">
-27.44342
+26.13690
 </td>
 </tr>
 <tr>
@@ -176,7 +185,7 @@ RMSE CART
 RMSE CART Prune
 </td>
 <td style="text-align:right;">
-25.71317
+27.20387
 </td>
 </tr>
 <tr>
@@ -184,7 +193,7 @@ RMSE CART Prune
 RMSE Random Forest
 </td>
 <td style="text-align:right;">
-23.27455
+25.23439
 </td>
 </tr>
 <tr>
@@ -192,7 +201,7 @@ RMSE Random Forest
 RMSE Gradient Boosting
 </td>
 <td style="text-align:right;">
-26.61649
+26.49253
 </td>
 </tr>
 </tbody>
@@ -6321,7 +6330,7 @@ Average RMSE
 Hand-Built Linear Model
 </td>
 <td style="text-align:right;">
-11.70612
+11.73180
 </td>
 </tr>
 <tr>
@@ -6329,7 +6338,7 @@ Hand-Built Linear Model
 Forward Selection Linear Model
 </td>
 <td style="text-align:right;">
-11.00667
+10.99788
 </td>
 </tr>
 <tr>
@@ -6337,7 +6346,7 @@ Forward Selection Linear Model
 Lasso
 </td>
 <td style="text-align:right;">
-12.09754
+12.10915
 </td>
 </tr>
 </tbody>
@@ -6358,8 +6367,8 @@ random forest.
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 17
     ## 
-    ##           Mean of squared residuals: 50.35656
-    ##                     % Var explained: 78.26
+    ##           Mean of squared residuals: 52.54301
+    ##                     % Var explained: 76.9
 
 The plot below shows that the bagging procedure can produce quite
 accurate predictions most of the time.
@@ -6400,7 +6409,7 @@ LOOCV RMSE
 LOOCV RMSE Rent Hand-Built Model
 </td>
 <td style="text-align:right;">
-11.739281
+11.758632
 </td>
 </tr>
 <tr>
@@ -6408,7 +6417,7 @@ LOOCV RMSE Rent Hand-Built Model
 LOOCV RMSE Rent Forward Selection Model
 </td>
 <td style="text-align:right;">
-11.090389
+11.046992
 </td>
 </tr>
 <tr>
@@ -6416,7 +6425,7 @@ LOOCV RMSE Rent Forward Selection Model
 LOOCV RMSE Model Lasso Model
 </td>
 <td style="text-align:right;">
-12.122334
+12.145120
 </td>
 </tr>
 <tr>
@@ -6424,7 +6433,7 @@ LOOCV RMSE Model Lasso Model
 LOOCV RMSE Model Bagging Model
 </td>
 <td style="text-align:right;">
-6.886680
+7.030377
 </td>
 </tr>
 <tr>
@@ -6432,7 +6441,7 @@ LOOCV RMSE Model Bagging Model
 LOOCV RMSE Model RandomForest Model
 </td>
 <td style="text-align:right;">
-7.193229
+7.377666
 </td>
 </tr>
 </tbody>
