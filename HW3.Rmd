@@ -5,6 +5,7 @@ date: "4/6/2022"
 output:
   md_document:
     variant: markdown_github
+always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
