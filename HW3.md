@@ -76,64 +76,13 @@ statistically significant effects of police on crime.
 
 ## Tree modeling: dengue cases
 
-    ## $city
-    ## [1] "character"
-    ## 
-    ## $season
-    ## [1] "character"
-    ## 
-    ## $total_cases
-    ## [1] "numeric"
-    ## 
-    ## $ndvi_ne
-    ## [1] "numeric"
-    ## 
-    ## $ndvi_nw
-    ## [1] "numeric"
-    ## 
-    ## $ndvi_se
-    ## [1] "numeric"
-    ## 
-    ## $ndvi_sw
-    ## [1] "numeric"
-    ## 
-    ## $precipitation_amt
-    ## [1] "numeric"
-    ## 
-    ## $air_temp_k
-    ## [1] "numeric"
-    ## 
-    ## $avg_temp_k
-    ## [1] "numeric"
-    ## 
-    ## $dew_point_temp_k
-    ## [1] "numeric"
-    ## 
-    ## $max_air_temp_k
-    ## [1] "numeric"
-    ## 
-    ## $min_air_temp_k
-    ## [1] "numeric"
-    ## 
-    ## $precip_amt_kg_per_m2
-    ## [1] "numeric"
-    ## 
-    ## $relative_humidity_percent
-    ## [1] "numeric"
-    ## 
-    ## $specific_humidity
-    ## [1] "numeric"
-    ## 
-    ## $tdtr_k
-    ## [1] "numeric"
-
 ![](HW3_files/figure-markdown_github/setup%201.1-1.png)
 
-    ## [1] 0.08232379
+    ## [1] 0.07871012
 
 ![](HW3_files/figure-markdown_github/setup%201.1-2.png)![](HW3_files/figure-markdown_github/setup%201.1-3.png)
 
-    ## [1] 216
+    ## [1] 213
     ## attr(,"smoother")
     ## Call:
     ## loess(formula = object$oobag.improve ~ x, enp.target = min(max(4, 
@@ -141,15 +90,15 @@ statistically significant effects of police on crime.
     ## 
     ## Number of Observations: 10000 
     ## Equivalent Number of Parameters: 39.99 
-    ## Residual Standard Error: 0.1322
+    ## Residual Standard Error: 0.1069
 
-    ## [1] 25.57661
+    ## [1] 30.79668
 
-    ## [1] 25.65604
+    ## [1] 35.31411
 
-    ## [1] 24.51788
+    ## [1] 32.44756
 
-    ## [1] 27.23709
+    ## [1] 33.11275
 
 <table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
@@ -170,7 +119,7 @@ RMSE
 RMSE CART
 </td>
 <td style="text-align:right;">
-25.57661
+30.79668
 </td>
 </tr>
 <tr>
@@ -178,7 +127,7 @@ RMSE CART
 RMSE CART Prune
 </td>
 <td style="text-align:right;">
-25.65604
+35.31411
 </td>
 </tr>
 <tr>
@@ -186,7 +135,7 @@ RMSE CART Prune
 RMSE Random Forest
 </td>
 <td style="text-align:right;">
-24.51788
+32.44756
 </td>
 </tr>
 <tr>
@@ -194,7 +143,7 @@ RMSE Random Forest
 RMSE Gradient Boosting
 </td>
 <td style="text-align:right;">
-27.23709
+33.11275
 </td>
 </tr>
 </tbody>
@@ -6324,7 +6273,7 @@ Average RMSE
 Hand-Built Linear Model
 </td>
 <td style="text-align:right;">
-11.86299
+11.78251
 </td>
 </tr>
 <tr>
@@ -6332,7 +6281,7 @@ Hand-Built Linear Model
 Forward Selection Linear Model
 </td>
 <td style="text-align:right;">
-11.16721
+11.08406
 </td>
 </tr>
 <tr>
@@ -6340,7 +6289,7 @@ Forward Selection Linear Model
 Lasso
 </td>
 <td style="text-align:right;">
-12.24777
+12.16384
 </td>
 </tr>
 </tbody>
@@ -6361,8 +6310,8 @@ random forest.
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 17
     ## 
-    ##           Mean of squared residuals: 47.75613
-    ##                     % Var explained: 79.61
+    ##           Mean of squared residuals: 47.45069
+    ##                     % Var explained: 79.59
 
 The plot below shows that the bagging procedure can produce quite
 accurate predictions most of the time.
@@ -6403,7 +6352,7 @@ LOOCV RMSE
 LOOCV RMSE Rent Hand-Built Model
 </td>
 <td style="text-align:right;">
-11.746242
+11.737640
 </td>
 </tr>
 <tr>
@@ -6411,7 +6360,7 @@ LOOCV RMSE Rent Hand-Built Model
 LOOCV RMSE Rent Forward Selection Model
 </td>
 <td style="text-align:right;">
-11.048162
+11.074856
 </td>
 </tr>
 <tr>
@@ -6419,7 +6368,7 @@ LOOCV RMSE Rent Forward Selection Model
 LOOCV RMSE Model Lasso Model
 </td>
 <td style="text-align:right;">
-12.123827
+12.121730
 </td>
 </tr>
 <tr>
@@ -6427,7 +6376,7 @@ LOOCV RMSE Model Lasso Model
 LOOCV RMSE Model Bagging Model
 </td>
 <td style="text-align:right;">
-6.638831
+7.065052
 </td>
 </tr>
 <tr>
@@ -6435,7 +6384,7 @@ LOOCV RMSE Model Bagging Model
 LOOCV RMSE Model RandomForest Model
 </td>
 <td style="text-align:right;">
-7.124394
+7.327221
 </td>
 </tr>
 </tbody>

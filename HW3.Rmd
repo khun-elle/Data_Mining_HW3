@@ -60,7 +60,7 @@ D.C. is split into seven police districts. Table 4 uses this fact to find more v
 dengue <- read_csv("https://raw.githubusercontent.com/jgscott/ECO395M/master/data/dengue.csv") %>% drop_na()
 
 ## Tree modeling: dengue cases
-lapply(dengue, class)
+#lapply(dengue, class)
 
 dengue$city <- dengue$city %>% factor()
 dengue$season <- dengue$season %>% factor()
