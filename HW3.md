@@ -136,11 +136,11 @@ statistically significant effects of police on crime.
 
 ![](HW3_files/figure-markdown_github/setup%201.1-1.png)
 
-    ## [1] 0.06122348
+    ## [1] 0.06882879
 
 ![](HW3_files/figure-markdown_github/setup%201.1-2.png)![](HW3_files/figure-markdown_github/setup%201.1-3.png)
 
-    ## [1] 215
+    ## [1] 225
     ## attr(,"smoother")
     ## Call:
     ## loess(formula = object$oobag.improve ~ x, enp.target = min(max(4, 
@@ -148,15 +148,15 @@ statistically significant effects of police on crime.
     ## 
     ## Number of Observations: 10000 
     ## Equivalent Number of Parameters: 39.99 
-    ## Residual Standard Error: 0.1384
+    ## Residual Standard Error: 0.1378
 
-    ## [1] 26.1369
+    ## [1] 31.71668
 
-    ## [1] 27.20387
+    ## [1] 27.89065
 
-    ## [1] 25.23439
+    ## [1] 28.27091
 
-    ## [1] 26.49253
+    ## [1] 33.2412
 
 <table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
@@ -177,7 +177,7 @@ RMSE
 RMSE CART
 </td>
 <td style="text-align:right;">
-26.13690
+31.71668
 </td>
 </tr>
 <tr>
@@ -185,7 +185,7 @@ RMSE CART
 RMSE CART Prune
 </td>
 <td style="text-align:right;">
-27.20387
+27.89065
 </td>
 </tr>
 <tr>
@@ -193,7 +193,7 @@ RMSE CART Prune
 RMSE Random Forest
 </td>
 <td style="text-align:right;">
-25.23439
+28.27091
 </td>
 </tr>
 <tr>
@@ -201,7 +201,7 @@ RMSE Random Forest
 RMSE Gradient Boosting
 </td>
 <td style="text-align:right;">
-26.49253
+33.24120
 </td>
 </tr>
 </tbody>
@@ -6330,7 +6330,7 @@ Average RMSE
 Hand-Built Linear Model
 </td>
 <td style="text-align:right;">
-11.73180
+11.64639
 </td>
 </tr>
 <tr>
@@ -6338,7 +6338,7 @@ Hand-Built Linear Model
 Forward Selection Linear Model
 </td>
 <td style="text-align:right;">
-10.99788
+10.99948
 </td>
 </tr>
 <tr>
@@ -6346,7 +6346,7 @@ Forward Selection Linear Model
 Lasso
 </td>
 <td style="text-align:right;">
-12.10915
+12.01774
 </td>
 </tr>
 </tbody>
@@ -6367,8 +6367,8 @@ random forest.
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 17
     ## 
-    ##           Mean of squared residuals: 52.54301
-    ##                     % Var explained: 76.9
+    ##           Mean of squared residuals: 48.82622
+    ##                     % Var explained: 76.98
 
 The plot below shows that the bagging procedure can produce quite
 accurate predictions most of the time.
@@ -6409,7 +6409,7 @@ LOOCV RMSE
 LOOCV RMSE Rent Hand-Built Model
 </td>
 <td style="text-align:right;">
-11.758632
+11.751514
 </td>
 </tr>
 <tr>
@@ -6417,7 +6417,7 @@ LOOCV RMSE Rent Hand-Built Model
 LOOCV RMSE Rent Forward Selection Model
 </td>
 <td style="text-align:right;">
-11.046992
+11.062031
 </td>
 </tr>
 <tr>
@@ -6425,7 +6425,7 @@ LOOCV RMSE Rent Forward Selection Model
 LOOCV RMSE Model Lasso Model
 </td>
 <td style="text-align:right;">
-12.145120
+12.136549
 </td>
 </tr>
 <tr>
@@ -6433,7 +6433,7 @@ LOOCV RMSE Model Lasso Model
 LOOCV RMSE Model Bagging Model
 </td>
 <td style="text-align:right;">
-7.030377
+6.734157
 </td>
 </tr>
 <tr>
@@ -6441,7 +6441,7 @@ LOOCV RMSE Model Bagging Model
 LOOCV RMSE Model RandomForest Model
 </td>
 <td style="text-align:right;">
-7.377666
+7.171239
 </td>
 </tr>
 </tbody>
