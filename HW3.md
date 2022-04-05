@@ -78,11 +78,11 @@ statistically significant effects of police on crime.
 
 ![](HW3_files/figure-markdown_github/setup%201.1-1.png)
 
-    ## [1] 0.07871012
+    ## [1] 0.08731799
 
 ![](HW3_files/figure-markdown_github/setup%201.1-2.png)![](HW3_files/figure-markdown_github/setup%201.1-3.png)
 
-    ## [1] 213
+    ## [1] 222
     ## attr(,"smoother")
     ## Call:
     ## loess(formula = object$oobag.improve ~ x, enp.target = min(max(4, 
@@ -90,15 +90,15 @@ statistically significant effects of police on crime.
     ## 
     ## Number of Observations: 10000 
     ## Equivalent Number of Parameters: 39.99 
-    ## Residual Standard Error: 0.1069
+    ## Residual Standard Error: 0.09994
 
-    ## [1] 30.79668
+    ## [1] 35.55262
 
-    ## [1] 35.31411
+    ## [1] 36.04686
 
-    ## [1] 32.44756
+    ## [1] 34.09271
 
-    ## [1] 33.11275
+    ## [1] 36.08826
 
 <table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
@@ -119,7 +119,7 @@ RMSE
 RMSE CART
 </td>
 <td style="text-align:right;">
-30.79668
+35.55262
 </td>
 </tr>
 <tr>
@@ -127,7 +127,7 @@ RMSE CART
 RMSE CART Prune
 </td>
 <td style="text-align:right;">
-35.31411
+36.04686
 </td>
 </tr>
 <tr>
@@ -135,7 +135,7 @@ RMSE CART Prune
 RMSE Random Forest
 </td>
 <td style="text-align:right;">
-32.44756
+34.09271
 </td>
 </tr>
 <tr>
@@ -143,7 +143,7 @@ RMSE Random Forest
 RMSE Gradient Boosting
 </td>
 <td style="text-align:right;">
-33.11275
+36.08826
 </td>
 </tr>
 </tbody>
@@ -6273,7 +6273,7 @@ Average RMSE
 Hand-Built Linear Model
 </td>
 <td style="text-align:right;">
-11.78251
+11.94182
 </td>
 </tr>
 <tr>
@@ -6281,7 +6281,7 @@ Hand-Built Linear Model
 Forward Selection Linear Model
 </td>
 <td style="text-align:right;">
-11.08406
+11.20948
 </td>
 </tr>
 <tr>
@@ -6289,7 +6289,7 @@ Forward Selection Linear Model
 Lasso
 </td>
 <td style="text-align:right;">
-12.16384
+12.33225
 </td>
 </tr>
 </tbody>
@@ -6310,8 +6310,8 @@ random forest.
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 17
     ## 
-    ##           Mean of squared residuals: 47.45069
-    ##                     % Var explained: 79.59
+    ##           Mean of squared residuals: 51.29693
+    ##                     % Var explained: 78.73
 
 The plot below shows that the bagging procedure can produce quite
 accurate predictions most of the time.
@@ -6352,7 +6352,7 @@ LOOCV RMSE
 LOOCV RMSE Rent Hand-Built Model
 </td>
 <td style="text-align:right;">
-11.737640
+11.755004
 </td>
 </tr>
 <tr>
@@ -6360,7 +6360,7 @@ LOOCV RMSE Rent Hand-Built Model
 LOOCV RMSE Rent Forward Selection Model
 </td>
 <td style="text-align:right;">
-11.074856
+11.072580
 </td>
 </tr>
 <tr>
@@ -6368,7 +6368,7 @@ LOOCV RMSE Rent Forward Selection Model
 LOOCV RMSE Model Lasso Model
 </td>
 <td style="text-align:right;">
-12.121730
+12.131566
 </td>
 </tr>
 <tr>
@@ -6376,7 +6376,7 @@ LOOCV RMSE Model Lasso Model
 LOOCV RMSE Model Bagging Model
 </td>
 <td style="text-align:right;">
-7.065052
+7.011890
 </td>
 </tr>
 <tr>
@@ -6384,7 +6384,7 @@ LOOCV RMSE Model Bagging Model
 LOOCV RMSE Model RandomForest Model
 </td>
 <td style="text-align:right;">
-7.327221
+7.284334
 </td>
 </tr>
 </tbody>
@@ -6392,9 +6392,21 @@ LOOCV RMSE Model RandomForest Model
 
 **Random Forest as the best predictive model possible**
 
-    The tree decision models perform almost twice better than the remaining three models, based on the RMSE. We decided to use Random Forest as a predictive model for rent since its does not differ as much from the RMSE of bagging, and the procedure it uses usually results in an improvement over bagging as mentioned before. 
+The tree decision models perform almost twice better than the remaining
+three models, based on the RMSE. We decided to use Random Forest as a
+predictive model for rent since its does not differ as much from the
+RMSE of bagging, and the procedure it uses usually results in an
+improvement over bagging as mentioned before.
 
-    Below is a list of the variable importance for each variable used in Random Forest. The first column shows the increase in Mean Squared Error if that particular variable is omitted from the model. The MSE is calculated based on the out of bag samples. The second column shows the increase in node purity that results from splits over that variable. The increase in node purity is averaged over all trees. As shown below, the most important variable based on MSE is "age" because if omitted, the MSE increases the most. However, Electricity costs and Size increase the most node purity. 
+Below is a list of the variable importance for each variable used in
+Random Forest. The first column shows the increase in Mean Squared Error
+if that particular variable is omitted from the model. The MSE is
+calculated based on the out of bag samples. The second column shows the
+increase in node purity that results from splits over that variable. The
+increase in node purity is averaged over all trees. As shown below, the
+most important variable based on MSE is “age” because if omitted, the
+MSE increases the most. However, Electricity costs and Size increase the
+most node purity.
 
 <table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>

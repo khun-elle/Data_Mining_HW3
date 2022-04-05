@@ -433,9 +433,9 @@ kable(AvgRMSEModels, col.names = c("LOOCV RMSE"), caption = "**Table 1.3 LOOCV R
 ```
 **Random Forest as the best predictive model possible** 
     
-    The tree decision models perform almost twice better than the remaining three models, based on the RMSE. We decided to use Random Forest as a predictive model for rent since its does not differ as much from the RMSE of bagging, and the procedure it uses usually results in an improvement over bagging as mentioned before. 
+The tree decision models perform almost twice better than the remaining three models, based on the RMSE. We decided to use Random Forest as a predictive model for rent since its does not differ as much from the RMSE of bagging, and the procedure it uses usually results in an improvement over bagging as mentioned before. 
 
-    Below is a list of the variable importance for each variable used in Random Forest. The first column shows the increase in Mean Squared Error if that particular variable is omitted from the model. The MSE is calculated based on the out of bag samples. The second column shows the increase in node purity that results from splits over that variable. The increase in node purity is averaged over all trees. As shown below, the most important variable based on MSE is "age" because if omitted, the MSE increases the most. However, Electricity costs and Size increase the most node purity. 
+Below is a list of the variable importance for each variable used in Random Forest. The first column shows the increase in Mean Squared Error if that particular variable is omitted from the model. The MSE is calculated based on the out of bag samples. The second column shows the increase in node purity that results from splits over that variable. The increase in node purity is averaged over all trees. As shown below, the most important variable based on MSE is "age" because if omitted, the MSE increases the most. However, Electricity costs and Size increase the most node purity. 
 
 ```{r setup 1.12, warning=FALSE, echo=FALSE}    
 set.seed(1)
@@ -495,7 +495,7 @@ kable(DiffMean, col.names = c("Average Green Rating Effect on Rent"), caption = 
 ## Predictive model building: California housing
 ```{r setup 1.15, warning=FALSE, echo=FALSE}  
 register_google(key = "AIzaSyDjCXavvnwba1KARYeX0z-FhiVlf6bnzcg")
-CAhousing <- read_csv("/Users/jirapat/Desktop/R/Data Mining/CAhousing.csv")
+CAhousing <- read_csv("https://raw.githubusercontent.com/jgscott/ECO395M/master/data/CAhousing.csv")
 CAmap <- get_map("california", zoom=4)
 CAhousing_split <- initial_split(CAhousing, 0.8)
 CAhousing_train <- training(CAhousing_split)
