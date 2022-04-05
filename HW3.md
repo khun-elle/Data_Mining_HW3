@@ -1,8 +1,6 @@
-\#What causes what?
+# What causes what?
 
-\#\#\#Why can’t I just get data from a few different cities and run the
-regression of “Crime” on “Police” to understand how more cops in the
-streets affect crime?
+### Why can’t I just get data from a few different cities and run the regression of “Crime” on “Police” to understand how more cops in the streets affect crime?
 
 The relationship between number of polices and crime rate suffers from
 endogeneity, x (number of polices) correlates with e (could be city’s
@@ -136,11 +134,11 @@ statistically significant effects of police on crime.
 
 ![](HW3_files/figure-markdown_github/setup%201.1-1.png)
 
-    ## [1] 0.06882879
+    ## [1] 0.0363064
 
 ![](HW3_files/figure-markdown_github/setup%201.1-2.png)![](HW3_files/figure-markdown_github/setup%201.1-3.png)
 
-    ## [1] 225
+    ## [1] 207
     ## attr(,"smoother")
     ## Call:
     ## loess(formula = object$oobag.improve ~ x, enp.target = min(max(4, 
@@ -148,15 +146,15 @@ statistically significant effects of police on crime.
     ## 
     ## Number of Observations: 10000 
     ## Equivalent Number of Parameters: 39.99 
-    ## Residual Standard Error: 0.1378
+    ## Residual Standard Error: 0.1252
 
-    ## [1] 31.71668
+    ## [1] 30.0531
 
-    ## [1] 27.89065
+    ## [1] 28.85954
 
-    ## [1] 28.27091
+    ## [1] 27.36282
 
-    ## [1] 33.2412
+    ## [1] 28.05037
 
 <table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
@@ -177,7 +175,7 @@ RMSE
 RMSE CART
 </td>
 <td style="text-align:right;">
-31.71668
+30.05310
 </td>
 </tr>
 <tr>
@@ -185,7 +183,7 @@ RMSE CART
 RMSE CART Prune
 </td>
 <td style="text-align:right;">
-27.89065
+28.85954
 </td>
 </tr>
 <tr>
@@ -193,7 +191,7 @@ RMSE CART Prune
 RMSE Random Forest
 </td>
 <td style="text-align:right;">
-28.27091
+27.36282
 </td>
 </tr>
 <tr>
@@ -201,7 +199,7 @@ RMSE Random Forest
 RMSE Gradient Boosting
 </td>
 <td style="text-align:right;">
-33.24120
+28.05037
 </td>
 </tr>
 </tbody>
@@ -6330,7 +6328,7 @@ Average RMSE
 Hand-Built Linear Model
 </td>
 <td style="text-align:right;">
-11.64639
+11.75309
 </td>
 </tr>
 <tr>
@@ -6338,7 +6336,7 @@ Hand-Built Linear Model
 Forward Selection Linear Model
 </td>
 <td style="text-align:right;">
-10.99948
+11.05393
 </td>
 </tr>
 <tr>
@@ -6346,7 +6344,7 @@ Forward Selection Linear Model
 Lasso
 </td>
 <td style="text-align:right;">
-12.01774
+12.13637
 </td>
 </tr>
 </tbody>
@@ -6367,8 +6365,8 @@ random forest.
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 17
     ## 
-    ##           Mean of squared residuals: 48.82622
-    ##                     % Var explained: 76.98
+    ##           Mean of squared residuals: 54.32594
+    ##                     % Var explained: 76.67
 
 The plot below shows that the bagging procedure can produce quite
 accurate predictions most of the time.
@@ -6409,7 +6407,7 @@ LOOCV RMSE
 LOOCV RMSE Rent Hand-Built Model
 </td>
 <td style="text-align:right;">
-11.751514
+11.773307
 </td>
 </tr>
 <tr>
@@ -6417,7 +6415,7 @@ LOOCV RMSE Rent Hand-Built Model
 LOOCV RMSE Rent Forward Selection Model
 </td>
 <td style="text-align:right;">
-11.062031
+11.101607
 </td>
 </tr>
 <tr>
@@ -6425,7 +6423,7 @@ LOOCV RMSE Rent Forward Selection Model
 LOOCV RMSE Model Lasso Model
 </td>
 <td style="text-align:right;">
-12.136549
+12.150734
 </td>
 </tr>
 <tr>
@@ -6433,7 +6431,7 @@ LOOCV RMSE Model Lasso Model
 LOOCV RMSE Model Bagging Model
 </td>
 <td style="text-align:right;">
-6.734157
+7.125477
 </td>
 </tr>
 <tr>
@@ -6441,7 +6439,7 @@ LOOCV RMSE Model Bagging Model
 LOOCV RMSE Model RandomForest Model
 </td>
 <td style="text-align:right;">
-7.171239
+7.498559
 </td>
 </tr>
 </tbody>

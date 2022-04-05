@@ -33,9 +33,9 @@ library(mosaic)
 library("devtools")
 ```
 
-#What causes what?
+# What causes what?
 
-###Why can’t I just get data from a few different cities and run the regression of “Crime” on “Police” to understand how more cops in the streets affect crime?
+### Why can’t I just get data from a few different cities and run the regression of “Crime” on “Police” to understand how more cops in the streets affect crime?
 
 The relationship between number of polices and crime rate suffers from endogeneity, x (number of polices) correlates with e (could be city's specific characteristics). Some cities that have high crime rate to begin with will typically hire polices. So the least square estimator can be biased. To control for heterogeneity across cities, we need cities fixed effect. 
 
