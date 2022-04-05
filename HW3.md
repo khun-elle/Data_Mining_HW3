@@ -17,9 +17,7 @@ therefore, tend to employ a large police force. Even if polices reduce
 crime, the crime rate will still be high. Thus, simple linear regression
 by using data from different cities will generate biased estimator.
 
-\#\#\#How were the researchers from UPenn able to isolate this effect?
-Briefly describe their approach and discuss their result in the “Table
-2” below, from the researchers’ paper
+### How were the researchers from UPenn able to isolate this effect? Briefly describe their approach and discuss their result in the “Table 2” below, from the researchers’ paper
 
 They wanted to isolate the effect of number of polices on crime by
 finding a variable unrelated to crime, but causes change in number of
@@ -40,8 +38,7 @@ there were going to be less victims on the street. From table 2 column
 tourist levels by including logged midday Metro ridership directly in
 the regression.
 
-\#\#\#Why did they have to control for Metro ridership? What was that
-trying to capture?
+### Why did they have to control for Metro ridership? What was that trying to capture?
 
 So there are less victims. But is it because there are less tourists?
 and therefore less victims? They controlled for Metro ridership so that
@@ -54,9 +51,7 @@ ridership is related to number of tourists but unrelated to crime rate.
 They are trying to capture causal effect of number of polices on crime
 rate.
 
-\#\#\#Below I am showing you “Table 4” from the researchers’ paper. Just
-focus on the first column of the table. Can you describe the model being
-estimated here? What is the conclusion?
+### Below I am showing you “Table 4” from the researchers’ paper. Just focus on the first column of the table. Can you describe the model being estimated here? What is the conclusion?
 
 D.C. is split into seven police districts. Table 4 uses this fact to
 find more variation in policing response to the high-alert days.
@@ -79,7 +74,7 @@ tourism or some other factor relating to people being out-and-about,
 since the researchers control for Metro ridership and still find
 statistically significant effects of police on crime.
 
-\#\#Tree modeling: dengue cases
+## Tree modeling: dengue cases
 
     ## $city
     ## [1] "character"
@@ -134,11 +129,11 @@ statistically significant effects of police on crime.
 
 ![](HW3_files/figure-markdown_github/setup%201.1-1.png)
 
-    ## [1] 0.0363064
+    ## [1] 0.08232379
 
 ![](HW3_files/figure-markdown_github/setup%201.1-2.png)![](HW3_files/figure-markdown_github/setup%201.1-3.png)
 
-    ## [1] 207
+    ## [1] 216
     ## attr(,"smoother")
     ## Call:
     ## loess(formula = object$oobag.improve ~ x, enp.target = min(max(4, 
@@ -146,15 +141,15 @@ statistically significant effects of police on crime.
     ## 
     ## Number of Observations: 10000 
     ## Equivalent Number of Parameters: 39.99 
-    ## Residual Standard Error: 0.1252
+    ## Residual Standard Error: 0.1322
 
-    ## [1] 30.0531
+    ## [1] 25.57661
 
-    ## [1] 28.85954
+    ## [1] 25.65604
 
-    ## [1] 27.36282
+    ## [1] 24.51788
 
-    ## [1] 28.05037
+    ## [1] 27.23709
 
 <table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
@@ -175,7 +170,7 @@ RMSE
 RMSE CART
 </td>
 <td style="text-align:right;">
-30.05310
+25.57661
 </td>
 </tr>
 <tr>
@@ -183,7 +178,7 @@ RMSE CART
 RMSE CART Prune
 </td>
 <td style="text-align:right;">
-28.85954
+25.65604
 </td>
 </tr>
 <tr>
@@ -191,7 +186,7 @@ RMSE CART Prune
 RMSE Random Forest
 </td>
 <td style="text-align:right;">
-27.36282
+24.51788
 </td>
 </tr>
 <tr>
@@ -199,7 +194,7 @@ RMSE Random Forest
 RMSE Gradient Boosting
 </td>
 <td style="text-align:right;">
-28.05037
+27.23709
 </td>
 </tr>
 </tbody>
@@ -207,18 +202,19 @@ RMSE Gradient Boosting
 
 ![](HW3_files/figure-markdown_github/setup%201.1-4.png)![](HW3_files/figure-markdown_github/setup%201.1-5.png)![](HW3_files/figure-markdown_github/setup%201.1-6.png)
 
-\#\#Predictive model building: green certification To build the most
-accurate predictive model possible, we compared multiple statistical
-methods: a hand-built linear model, a linear model using forward
-selection, Lasso model, and two tree-based models using bagging and
-random forest, respectively. We first compared the two linear models
-with Lasso by using train/test splits with a loop of 100 to calculate
-the RMSE, and we concluded that Lasso did not result in an improved
-prediction accuracy. Therefore, we included the tree-based models to try
-and improve our predictions. In order to decide which model performs
-best, out of the 5 previously described models, we employed
-Leave-one-out cross validation (LOOCV) RMSE, and chose the one that
-decreased the RMSE the most.
+## Predictive model building: green certification
+
+To build the most accurate predictive model possible, we compared
+multiple statistical methods: a hand-built linear model, a linear model
+using forward selection, Lasso model, and two tree-based models using
+bagging and random forest, respectively. We first compared the two
+linear models with Lasso by using train/test splits with a loop of 100
+to calculate the RMSE, and we concluded that Lasso did not result in an
+improved prediction accuracy. Therefore, we included the tree-based
+models to try and improve our predictions. In order to decide which
+model performs best, out of the 5 previously described models, we
+employed Leave-one-out cross validation (LOOCV) RMSE, and chose the one
+that decreased the RMSE the most.
 
 Before starting fitting regression models, we needed to omit all missing
 variables in the dataset. Total observations got reduced from 7,894 to
@@ -6328,7 +6324,7 @@ Average RMSE
 Hand-Built Linear Model
 </td>
 <td style="text-align:right;">
-11.75309
+11.86299
 </td>
 </tr>
 <tr>
@@ -6336,7 +6332,7 @@ Hand-Built Linear Model
 Forward Selection Linear Model
 </td>
 <td style="text-align:right;">
-11.05393
+11.16721
 </td>
 </tr>
 <tr>
@@ -6344,7 +6340,7 @@ Forward Selection Linear Model
 Lasso
 </td>
 <td style="text-align:right;">
-12.13637
+12.24777
 </td>
 </tr>
 </tbody>
@@ -6365,8 +6361,8 @@ random forest.
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 17
     ## 
-    ##           Mean of squared residuals: 54.32594
-    ##                     % Var explained: 76.67
+    ##           Mean of squared residuals: 47.75613
+    ##                     % Var explained: 79.61
 
 The plot below shows that the bagging procedure can produce quite
 accurate predictions most of the time.
@@ -6407,7 +6403,7 @@ LOOCV RMSE
 LOOCV RMSE Rent Hand-Built Model
 </td>
 <td style="text-align:right;">
-11.773307
+11.746242
 </td>
 </tr>
 <tr>
@@ -6415,7 +6411,7 @@ LOOCV RMSE Rent Hand-Built Model
 LOOCV RMSE Rent Forward Selection Model
 </td>
 <td style="text-align:right;">
-11.101607
+11.048162
 </td>
 </tr>
 <tr>
@@ -6423,7 +6419,7 @@ LOOCV RMSE Rent Forward Selection Model
 LOOCV RMSE Model Lasso Model
 </td>
 <td style="text-align:right;">
-12.150734
+12.123827
 </td>
 </tr>
 <tr>
@@ -6431,7 +6427,7 @@ LOOCV RMSE Model Lasso Model
 LOOCV RMSE Model Bagging Model
 </td>
 <td style="text-align:right;">
-7.125477
+6.638831
 </td>
 </tr>
 <tr>
@@ -6439,7 +6435,7 @@ LOOCV RMSE Model Bagging Model
 LOOCV RMSE Model RandomForest Model
 </td>
 <td style="text-align:right;">
-7.498559
+7.124394
 </td>
 </tr>
 </tbody>
